@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register('posts', PostViewSet)
 router.register('groups', GroupViewSet)
 router.register('follow', FollowViewSet, basename='followers')
-router.register('posts/(?P<post_id>\d+)/comments',
+router.register(r'posts/(?P<post_id>\d+)/comments',
                 CommentViewSet, basename='comments')
 
 urlpatterns = [
