@@ -3,7 +3,7 @@ from posts.models import Group, Post
 from rest_framework import filters, permissions, viewsets
 from rest_framework.exceptions import NotAuthenticated
 
-from .permissions import AuthorPermition
+from .permissions import AuthorPermission
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
@@ -30,27 +30,23 @@ class FollowViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (AuthorPermition,)
+    permission_classes = (
+        AuthorPermission, permissions.IsAuthenticatedOrReadOnly)
 
     def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            serializer.save(author=self.request.user)
-        else:
-            raise NotAuthenticated
+        serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorPermition,)
+    permission_classes = (
+        AuthorPermission, permissions.IsAuthenticatedOrReadOnly)
 
     def perform_create(self, serializer):
         post = get_object_or_404(
             Post,
             id=self.kwargs.get('post_id'))
-        if self.request.user.is_authenticated:
-            serializer.save(author=self.request.user, post=post)
-        else:
-            raise NotAuthenticated
+        serializer.save(author=self.request.user, post=post)
 
     def get_queryset(self):
         post = get_object_or_404(
